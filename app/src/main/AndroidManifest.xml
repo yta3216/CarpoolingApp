@@ -93,6 +93,10 @@
             android:name=".activities.SearchFormActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".activities.RideDetailActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

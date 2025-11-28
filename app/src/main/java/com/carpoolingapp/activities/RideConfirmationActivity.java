@@ -39,11 +39,18 @@ public class RideConfirmationActivity extends AppCompatActivity {
 
         if (type == null) type = "booking";
 
+        boolean isDemo = getIntent().getBooleanExtra("isDemo", false);
+
         switch (type) {
             case "booking":
                 rootLayout.setBackgroundColor(getColor(R.color.primary_blue));
-                confirmationTitle.setText(R.string.ride_confirmed);
-                confirmationSubtitle.setText(R.string.find_your_ride);
+                if (isDemo) {
+                    confirmationTitle.setText("🎉 Demo Complete!");
+                    confirmationSubtitle.setText("This booking is now in 'My Bookings'");
+                } else {
+                    confirmationTitle.setText(R.string.ride_confirmed);
+                    confirmationSubtitle.setText(R.string.find_your_ride);
+                }
                 primaryButton.setText(R.string.view_your_booking);
                 secondaryButton.setText(R.string.back_to_home);
                 break;

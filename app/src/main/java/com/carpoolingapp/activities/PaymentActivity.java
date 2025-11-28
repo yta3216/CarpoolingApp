@@ -71,7 +71,9 @@ public class PaymentActivity extends AppCompatActivity {
         String expiry = expiryEditText.getText().toString().trim();
         String cvv = cvvEditText.getText().toString().trim();
 
-        if (cardNumber.isEmpty() || expiry.isEmpty() || cvv.isEmpty()) {
+        boolean isDemo = getIntent().getBooleanExtra("isDemo", false);
+
+        if (!isDemo && (cardNumber.isEmpty() || expiry.isEmpty() || cvv.isEmpty())) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -88,9 +90,17 @@ public class PaymentActivity extends AppCompatActivity {
             public void run() {
                 Toast.makeText(PaymentActivity.this, "Payment successful!", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(PaymentActivity.this, RideConfirmationActivity.class);
-                intent.putExtra("confirmationType", "booking");
-                startActivity(intent);
+                if (isDemo) {
+                    // Demo flow: Go to Chat first
+                    Intent intent = new Intent(PaymentActivity.this, ChatActivity.class);
+                    intent.putExtra("isDemo", true);
+                    startActivity(intent);
+                } else {
+                    // Normal flow: Go to confirmation
+                    Intent intent = new Intent(PaymentActivity.this, RideConfirmationActivity.class);
+                    intent.putExtra("confirmationType", "booking");
+                    startActivity(intent);
+                }
                 finish();
             }
         }, 2000);

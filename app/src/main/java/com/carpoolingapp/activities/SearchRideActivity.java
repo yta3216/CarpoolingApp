@@ -1,8 +1,10 @@
 package com.carpoolingapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,18 +13,19 @@ import com.carpoolingapp.R;
 import com.carpoolingapp.adapters.RideAdapter;
 import com.carpoolingapp.models.Ride;
 import com.carpoolingapp.utils.FirebaseHelper;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
-import android.widget.Toast;
 
 public class SearchRideActivity extends AppCompatActivity {
 
     private RecyclerView ridesRecyclerView;
     private View emptyState;
     private TextView emptyText;
+    private MaterialButton demoButton, demoWalkthroughButton;
     private RideAdapter adapter;
     private List<Ride> rideList;
     private FirebaseHelper firebaseHelper;
@@ -42,6 +45,7 @@ public class SearchRideActivity extends AppCompatActivity {
         initViews();
         setupToolbar();
         setupRecyclerView();
+        setupDemoButtons();
         searchRides();
     }
 
@@ -49,6 +53,8 @@ public class SearchRideActivity extends AppCompatActivity {
         ridesRecyclerView = findViewById(R.id.ridesRecyclerView);
         emptyState = findViewById(R.id.emptyState);
         emptyText = findViewById(R.id.emptyText);
+        demoButton = findViewById(R.id.demoButton);
+        demoWalkthroughButton = findViewById(R.id.demoWalkthroughButton);
         firebaseHelper = FirebaseHelper.getInstance();
     }
 
@@ -59,16 +65,44 @@ public class SearchRideActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("Search Results");
         }
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void setupRecyclerView() {
         rideList = new ArrayList<>();
-        adapter = new RideAdapter(this, rideList, ride -> {
-            Toast.makeText(this, "Ride from " + ride.getFromLocation() + " to " + ride.getToLocation(), Toast.LENGTH_SHORT).show();
+        adapter = new RideAdapter(this, rideList, new RideAdapter.OnRideClickListener() {
+            @Override
+            public void onRideClick(Ride ride) {
+                Toast.makeText(SearchRideActivity.this, "Ride from " + ride.getFromLocation() + " to " + ride.getToLocation(), Toast.LENGTH_SHORT).show();
+            }
         });
         ridesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         ridesRecyclerView.setAdapter(adapter);
+    }
+
+    private void setupDemoButtons() {
+        View.OnClickListener demoClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start demo walkthrough
+                Toast.makeText(SearchRideActivity.this, "Starting demo walkthrough...", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(SearchRideActivity.this, RideDetailActivity.class);
+                startActivity(intent);
+            }
+        };
+
+        if (demoButton != null) {
+            demoButton.setOnClickListener(demoClickListener);
+        }
+
+        if (demoWalkthroughButton != null) {
+            demoWalkthroughButton.setOnClickListener(demoClickListener);
+        }
     }
 
     private void searchRides() {

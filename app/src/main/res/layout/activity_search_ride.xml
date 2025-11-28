@@ -13,13 +13,16 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary_blue"
         android:elevation="4dp"
+        app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:title="Search Results"
         app:titleTextColor="@color/white" />
 
-    <!-- Rides List -->
+    <!-- Search Results RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ridesRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:padding="16dp"
         android:clipToPadding="false" />
 
@@ -27,7 +30,8 @@
     <LinearLayout
         android:id="@+id/emptyState"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone">
@@ -46,8 +50,36 @@
             android:layout_marginTop="16dp"
             android:text="No rides found"
             android:textColor="@color/text_secondary"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
+
+        <!-- Demo Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/demoWalkthroughButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Can't find one? Try Demo Booking"
+            android:textColor="@color/primary_blue"
+            app:strokeColor="@color/primary_blue"
+            app:cornerRadius="20dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
 
     </LinearLayout>
+
+    <!-- Demo Button (Always Visible at Bottom) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/demoButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="📍 Demo: See booking walkthrough"
+        android:textColor="@color/primary_blue"
+        android:textSize="14sp" />
 
 </LinearLayout>
