@@ -19,6 +19,7 @@ public class RideDetailActivity extends AppCompatActivity {
     private SharedPrefsHelper prefsHelper;
     private String rideId;
     private String driverId;
+    private String driverName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,6 @@ public class RideDetailActivity extends AppCompatActivity {
     }
 
     private void loadRideData() {
-        // Check if this is demo mode
         boolean isDemo = getIntent().getBooleanExtra("isDemo", false);
 
         if (isDemo) {
@@ -63,15 +63,16 @@ public class RideDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // Load actual ride data from intent
+        // Load actual ride data
         rideId = getIntent().getStringExtra("rideId");
+        driverId = getIntent().getStringExtra("driverId");
         String from = getIntent().getStringExtra("from");
         String to = getIntent().getStringExtra("to");
         String date = getIntent().getStringExtra("date");
         String time = getIntent().getStringExtra("time");
         double price = getIntent().getDoubleExtra("price", 0.0);
         int seats = getIntent().getIntExtra("seats", 0);
-        String driverName = getIntent().getStringExtra("driverName");
+        driverName = getIntent().getStringExtra("driverName");
 
         if (from != null) fromText.setText(from);
         if (to != null) toText.setText(to);
@@ -90,36 +91,32 @@ public class RideDetailActivity extends AppCompatActivity {
         priceText.setText("$15.00");
         seatsText.setText("3 seats available");
         driverNameText.setText("Demo Driver");
+        driverName = "Demo Driver";
     }
 
     private void setupListeners() {
-        bookNowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                bookRide();
-            }
-        });
+        bookNowButton.setOnClickListener(v -> bookRide());
     }
 
     private void bookRide() {
         // Check if user is trying to book their own ride
         String currentUserId = prefsHelper.getUserId();
-        String rideDriverId = getIntent().getStringExtra("driverId");
 
-        if (currentUserId != null && currentUserId.equals(rideDriverId)) {
+        if (currentUserId != null && currentUserId.equals(driverId)) {
             Toast.makeText(this, "You cannot book your own ride!", Toast.LENGTH_LONG).show();
             return;
         }
 
-        // Get price for payment
         double price = getIntent().getDoubleExtra("price", 15.00);
         boolean isDemo = getIntent().getBooleanExtra("isDemo", false);
 
-        // Go to payment activity
+        // Go to payment
         Intent intent = new Intent(RideDetailActivity.this, PaymentActivity.class);
         intent.putExtra("totalPrice", price);
         intent.putExtra("isDemo", isDemo);
         intent.putExtra("rideId", rideId);
+        intent.putExtra("driverId", driverId);
+        intent.putExtra("driverName", driverName);
         intent.putExtra("from", fromText.getText().toString());
         intent.putExtra("to", toText.getText().toString());
         intent.putExtra("date", dateText.getText().toString());

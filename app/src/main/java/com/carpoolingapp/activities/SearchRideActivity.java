@@ -29,7 +29,7 @@ public class SearchRideActivity extends AppCompatActivity {
 
     private RecyclerView ridesRecyclerView;
     private View emptyState;
-    private TextView emptyText, sortByText;
+    private TextView emptyText;
     private MaterialButton demoButton, demoWalkthroughButton;
     private Spinner sortSpinner;
     private RideAdapter adapter;
@@ -37,14 +37,13 @@ public class SearchRideActivity extends AppCompatActivity {
     private FirebaseHelper firebaseHelper;
 
     private String searchFrom, searchTo, searchDate;
-    private String currentSortOption = "Cheapest"; // Default
+    private String currentSortOption = "Cheapest";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_ride);
 
-        // Get search parameters
         searchFrom = getIntent().getStringExtra("from");
         searchTo = getIntent().getStringExtra("to");
         searchDate = getIntent().getStringExtra("date");
@@ -63,7 +62,6 @@ public class SearchRideActivity extends AppCompatActivity {
         emptyText = findViewById(R.id.emptyText);
         demoButton = findViewById(R.id.demoButton);
         demoWalkthroughButton = findViewById(R.id.demoWalkthroughButton);
-        sortByText = findViewById(R.id.textView2);
         sortSpinner = findViewById(R.id.sortSpinner);
         firebaseHelper = FirebaseHelper.getInstance();
     }
@@ -75,42 +73,31 @@ public class SearchRideActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("Search Results");
         }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupSortSpinner() {
-        // Create sort options
-        String[] sortOptions = {"Cheapest", "Fastest"};
+        if (sortSpinner == null) return;
 
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
-                android.R.layout.simple_spinner_item,
-                sortOptions
+                R.array.sort_options,
+                android.R.layout.simple_spinner_item
         );
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortSpinner.setAdapter(adapter);
 
-        if (sortSpinner != null) {
-            sortSpinner.setAdapter(spinnerAdapter);
-            sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    currentSortOption = sortOptions[position];
-                    if (sortByText != null) {
-                        sortByText.setText(currentSortOption);
-                    }
-                    sortRides();
-                }
+        sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                currentSortOption = parent.getItemAtPosition(position).toString();
+                sortRides();
+            }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
-        }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     private void setupRecyclerView() {
@@ -118,16 +105,17 @@ public class SearchRideActivity extends AppCompatActivity {
         adapter = new RideAdapter(this, rideList, new RideAdapter.OnRideClickListener() {
             @Override
             public void onRideClick(Ride ride) {
-                // Open ride detail
+                // Open ride details
                 Intent intent = new Intent(SearchRideActivity.this, RideDetailActivity.class);
                 intent.putExtra("rideId", ride.getRideId());
+                intent.putExtra("driverId", ride.getDriverId());
+                intent.putExtra("driverName", ride.getDriverName());
                 intent.putExtra("from", ride.getFromLocation());
                 intent.putExtra("to", ride.getToLocation());
                 intent.putExtra("date", ride.getDate());
                 intent.putExtra("time", ride.getTime());
                 intent.putExtra("price", ride.getPricePerSeat());
                 intent.putExtra("seats", ride.getAvailableSeats());
-                intent.putExtra("driverName", ride.getDriverName());
                 startActivity(intent);
             }
         });
@@ -136,14 +124,11 @@ public class SearchRideActivity extends AppCompatActivity {
     }
 
     private void setupDemoButtons() {
-        View.OnClickListener demoClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Start demo walkthrough
-                Toast.makeText(SearchRideActivity.this, "Starting demo walkthrough...", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(SearchRideActivity.this, RideDetailActivity.class);
-                startActivity(intent);
-            }
+        View.OnClickListener demoClickListener = v -> {
+            Toast.makeText(SearchRideActivity.this, "Starting demo walkthrough...", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(SearchRideActivity.this, RideDetailActivity.class);
+            intent.putExtra("isDemo", true);
+            startActivity(intent);
         };
 
         if (demoButton != null) {
@@ -168,15 +153,16 @@ public class SearchRideActivity extends AppCompatActivity {
                             if (ride != null) {
                                 ride.setRideId(snapshot.getKey());
 
-                                // ONLY show rides that are "hosting" type
                                 if (!"hosting".equals(ride.getRideType())) {
                                     continue;
                                 }
 
-                                // Filter by location and date
-                                boolean matchesFrom = searchFrom == null || ride.getFromLocation().toLowerCase().contains(searchFrom.toLowerCase());
-                                boolean matchesTo = searchTo == null || ride.getToLocation().toLowerCase().contains(searchTo.toLowerCase());
-                                boolean matchesDate = searchDate == null || ride.getDate().equals(searchDate);
+                                boolean matchesFrom = searchFrom == null ||
+                                        ride.getFromLocation().toLowerCase().contains(searchFrom.toLowerCase());
+                                boolean matchesTo = searchTo == null ||
+                                        ride.getToLocation().toLowerCase().contains(searchTo.toLowerCase());
+                                boolean matchesDate = searchDate == null ||
+                                        ride.getDate().equals(searchDate);
 
                                 if (matchesFrom && matchesTo && matchesDate) {
                                     rideList.add(ride);
@@ -190,7 +176,9 @@ public class SearchRideActivity extends AppCompatActivity {
                         if (rideList.isEmpty()) {
                             emptyState.setVisibility(View.VISIBLE);
                             ridesRecyclerView.setVisibility(View.GONE);
-                            emptyText.setText("No rides found matching your search");
+                            if (emptyText != null) {
+                                emptyText.setText("No rides found matching your search");
+                            }
                         } else {
                             emptyState.setVisibility(View.GONE);
                             ridesRecyclerView.setVisibility(View.VISIBLE);
@@ -205,12 +193,7 @@ public class SearchRideActivity extends AppCompatActivity {
     }
 
     private void sortRides() {
-        if (rideList == null || rideList.isEmpty()) {
-            return;
-        }
-
         if ("Cheapest".equals(currentSortOption)) {
-            // Sort by price (ascending)
             Collections.sort(rideList, new Comparator<Ride>() {
                 @Override
                 public int compare(Ride r1, Ride r2) {
@@ -218,7 +201,6 @@ public class SearchRideActivity extends AppCompatActivity {
                 }
             });
         } else if ("Fastest".equals(currentSortOption)) {
-            // Sort by time (earliest first)
             Collections.sort(rideList, new Comparator<Ride>() {
                 @Override
                 public int compare(Ride r1, Ride r2) {

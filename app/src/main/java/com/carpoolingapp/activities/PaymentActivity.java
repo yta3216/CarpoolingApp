@@ -8,6 +8,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import com.carpoolingapp.R;
+import com.carpoolingapp.models.Booking;
+import com.carpoolingapp.utils.FirebaseHelper;
+import com.carpoolingapp.utils.SharedPrefsHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -17,10 +20,16 @@ public class PaymentActivity extends AppCompatActivity {
     private TextView totalPriceText;
     private MaterialButton makePaymentButton;
 
+    private FirebaseHelper firebaseHelper;
+    private SharedPrefsHelper prefsHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_payment);
+
+        firebaseHelper = FirebaseHelper.getInstance();
+        prefsHelper = new SharedPrefsHelper(this);
 
         initViews();
         setupToolbar();
@@ -42,25 +51,14 @@ public class PaymentActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupListeners() {
-        makePaymentButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                processPayment();
-            }
-        });
+        makePaymentButton.setOnClickListener(v -> processPayment());
     }
 
     private void loadPaymentInfo() {
-        // Get data from intent
         double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
         totalPriceText.setText("$" + String.format("%.2f", totalPrice));
     }
@@ -72,44 +70,84 @@ public class PaymentActivity extends AppCompatActivity {
 
         boolean isDemo = getIntent().getBooleanExtra("isDemo", false);
 
-        // For demo, we're more lenient
         if (!isDemo && (cardNumber.isEmpty() || expiry.isEmpty() || cvv.isEmpty())) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Basic validation (for non-demo)
         if (!isDemo && cardNumber.length() < 13) {
             Toast.makeText(this, "Invalid card number", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Simulate payment processing
         makePaymentButton.setEnabled(false);
         makePaymentButton.setText("Processing...");
 
-        // TODO: Integrate real payment gateway (Stripe, PayPal, etc.)
+        // Create booking in Firebase
+        createBooking();
 
-        // Simulate success after delay
-        makePaymentButton.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(PaymentActivity.this, "Payment successful!", Toast.LENGTH_SHORT).show();
+        makePaymentButton.postDelayed(() -> {
+            Toast.makeText(PaymentActivity.this, "Payment successful!", Toast.LENGTH_SHORT).show();
 
-                // Always go to chat after payment
-                Intent intent = new Intent(PaymentActivity.this, ChatActivity.class);
-                intent.putExtra("isDemo", isDemo);
+            // Go to chat
+            Intent intent = new Intent(PaymentActivity.this, ChatActivity.class);
+            intent.putExtra("isDemo", isDemo);
+            intent.putExtra("rideId", getIntent().getStringExtra("rideId"));
+            intent.putExtra("from", getIntent().getStringExtra("from"));
+            intent.putExtra("to", getIntent().getStringExtra("to"));
+            intent.putExtra("date", getIntent().getStringExtra("date"));
+            intent.putExtra("time", getIntent().getStringExtra("time"));
+            intent.putExtra("otherUserName", getIntent().getStringExtra("driverName"));
 
-                // Pass ride details
-                intent.putExtra("rideId", getIntent().getStringExtra("rideId"));
-                intent.putExtra("from", getIntent().getStringExtra("from"));
-                intent.putExtra("to", getIntent().getStringExtra("to"));
-                intent.putExtra("date", getIntent().getStringExtra("date"));
-                intent.putExtra("time", getIntent().getStringExtra("time"));
-
-                startActivity(intent);
-                finish();
-            }
+            startActivity(intent);
+            finish();
         }, 2000);
+    }
+
+    private void createBooking() {
+        String rideId = getIntent().getStringExtra("rideId");
+        String from = getIntent().getStringExtra("from");
+        String to = getIntent().getStringExtra("to");
+        String date = getIntent().getStringExtra("date");
+        String time = getIntent().getStringExtra("time");
+        double totalPrice = getIntent().getDoubleExtra("totalPrice", 0.0);
+        String driverId = getIntent().getStringExtra("driverId");
+        String driverName = getIntent().getStringExtra("driverName");
+
+        String riderId = prefsHelper.getUserId();
+        String riderName = prefsHelper.getUserName();
+
+        if (riderId == null || rideId == null) return;
+
+        // Create booking object
+        Booking booking = new Booking(
+                rideId,
+                riderId,
+                riderName,
+                driverId != null ? driverId : "demo_driver",
+                driverName != null ? driverName : "Demo Driver",
+                from != null ? from : "Unknown",
+                to != null ? to : "Unknown",
+                date != null ? date : "TBD",
+                time != null ? time : "TBD",
+                1, // seats booked
+                totalPrice,
+                "Credit Card"
+        );
+
+        // Save to Firebase
+        String bookingId = firebaseHelper.getBookingsRef().push().getKey();
+        if (bookingId != null) {
+            booking.setBookingId(bookingId);
+            firebaseHelper.getBookingRef(bookingId).setValue(booking)
+                    .addOnSuccessListener(aVoid -> {
+                        // Booking saved successfully
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(PaymentActivity.this,
+                                "Failed to save booking: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
 }
