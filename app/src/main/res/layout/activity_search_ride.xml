@@ -6,12 +6,7 @@
     android:background="#839CABC2"
     android:orientation="vertical">
 
-    <!-- Toolbar -->
-
-    <!-- Search Results RecyclerView -->
-
-    <!-- Empty State -->
-
+    <!-- Header Card with Sorting -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="257dp"
@@ -40,31 +35,42 @@
             android:textColor="#FFFFFFFF"
             android:textSize="17sp" />
 
+        <Spinner
+            android:id="@+id/sortSpinner"
+            android:layout_width="150dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="145dp"
+            android:background="@android:drawable/btn_dropdown"
+            android:popupBackground="#FFFFFF"
+            android:spinnerMode="dropdown" />
+
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="60dp"
-            android:layout_marginTop="145dp"
+            android:layout_marginStart="220dp"
+            android:layout_marginTop="155dp"
             android:text="Cheapest"
             android:textColor="#FFFFFFFF"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
     </androidx.cardview.widget.CardView>
 
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ridesRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="255dp"
+        android:layout_height="0dp"
         android:layout_marginTop="-30dp"
         android:layout_weight="1"
         android:clipToPadding="false"
         android:padding="16dp"
-        android:paddingTop="30dp">
+        android:paddingTop="30dp" />
 
-    </androidx.recyclerview.widget.RecyclerView>
-
+    <!-- Demo Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/demoButton"
         style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -75,6 +81,7 @@
         android:textColor="@color/primary_blue"
         android:textSize="14sp" />
 
+    <!-- Empty State -->
     <LinearLayout
         android:id="@+id/emptyState"
         android:layout_width="match_parent"
@@ -118,7 +125,5 @@
             app:strokeColor="@color/primary_blue" />
 
     </LinearLayout>
-
-    <!-- Demo Button (Always Visible at Bottom) -->
 
 </LinearLayout>

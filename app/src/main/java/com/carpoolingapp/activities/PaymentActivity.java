@@ -1,6 +1,5 @@
 package com.carpoolingapp.activities;
 
-// File: CarpoolingApp/app/src/main/java/com/carpooling/app/activities/PaymentActivity.java
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -73,8 +72,15 @@ public class PaymentActivity extends AppCompatActivity {
 
         boolean isDemo = getIntent().getBooleanExtra("isDemo", false);
 
+        // For demo, we're more lenient
         if (!isDemo && (cardNumber.isEmpty() || expiry.isEmpty() || cvv.isEmpty())) {
             Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Basic validation (for non-demo)
+        if (!isDemo && cardNumber.length() < 13) {
+            Toast.makeText(this, "Invalid card number", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -90,17 +96,18 @@ public class PaymentActivity extends AppCompatActivity {
             public void run() {
                 Toast.makeText(PaymentActivity.this, "Payment successful!", Toast.LENGTH_SHORT).show();
 
-                if (isDemo) {
-                    // Demo flow: Go to Chat first
-                    Intent intent = new Intent(PaymentActivity.this, ChatActivity.class);
-                    intent.putExtra("isDemo", true);
-                    startActivity(intent);
-                } else {
-                    // Normal flow: Go to confirmation
-                    Intent intent = new Intent(PaymentActivity.this, RideConfirmationActivity.class);
-                    intent.putExtra("confirmationType", "booking");
-                    startActivity(intent);
-                }
+                // Always go to chat after payment
+                Intent intent = new Intent(PaymentActivity.this, ChatActivity.class);
+                intent.putExtra("isDemo", isDemo);
+
+                // Pass ride details
+                intent.putExtra("rideId", getIntent().getStringExtra("rideId"));
+                intent.putExtra("from", getIntent().getStringExtra("from"));
+                intent.putExtra("to", getIntent().getStringExtra("to"));
+                intent.putExtra("date", getIntent().getStringExtra("date"));
+                intent.putExtra("time", getIntent().getStringExtra("time"));
+
+                startActivity(intent);
                 finish();
             }
         }, 2000);

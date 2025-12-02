@@ -3,6 +3,9 @@ package com.carpoolingapp.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,19 +21,23 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class SearchRideActivity extends AppCompatActivity {
 
     private RecyclerView ridesRecyclerView;
     private View emptyState;
-    private TextView emptyText;
+    private TextView emptyText, sortByText;
     private MaterialButton demoButton, demoWalkthroughButton;
+    private Spinner sortSpinner;
     private RideAdapter adapter;
     private List<Ride> rideList;
     private FirebaseHelper firebaseHelper;
 
     private String searchFrom, searchTo, searchDate;
+    private String currentSortOption = "Cheapest"; // Default
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +51,7 @@ public class SearchRideActivity extends AppCompatActivity {
 
         initViews();
         setupToolbar();
+        setupSortSpinner();
         setupRecyclerView();
         setupDemoButtons();
         searchRides();
@@ -55,6 +63,8 @@ public class SearchRideActivity extends AppCompatActivity {
         emptyText = findViewById(R.id.emptyText);
         demoButton = findViewById(R.id.demoButton);
         demoWalkthroughButton = findViewById(R.id.demoWalkthroughButton);
+        sortByText = findViewById(R.id.textView2);
+        sortSpinner = findViewById(R.id.sortSpinner);
         firebaseHelper = FirebaseHelper.getInstance();
     }
 
@@ -73,12 +83,52 @@ public class SearchRideActivity extends AppCompatActivity {
         });
     }
 
+    private void setupSortSpinner() {
+        // Create sort options
+        String[] sortOptions = {"Cheapest", "Fastest"};
+
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                sortOptions
+        );
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        if (sortSpinner != null) {
+            sortSpinner.setAdapter(spinnerAdapter);
+            sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    currentSortOption = sortOptions[position];
+                    if (sortByText != null) {
+                        sortByText.setText(currentSortOption);
+                    }
+                    sortRides();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
+        }
+    }
+
     private void setupRecyclerView() {
         rideList = new ArrayList<>();
         adapter = new RideAdapter(this, rideList, new RideAdapter.OnRideClickListener() {
             @Override
             public void onRideClick(Ride ride) {
-                Toast.makeText(SearchRideActivity.this, "Ride from " + ride.getFromLocation() + " to " + ride.getToLocation(), Toast.LENGTH_SHORT).show();
+                // Open ride detail
+                Intent intent = new Intent(SearchRideActivity.this, RideDetailActivity.class);
+                intent.putExtra("rideId", ride.getRideId());
+                intent.putExtra("from", ride.getFromLocation());
+                intent.putExtra("to", ride.getToLocation());
+                intent.putExtra("date", ride.getDate());
+                intent.putExtra("time", ride.getTime());
+                intent.putExtra("price", ride.getPricePerSeat());
+                intent.putExtra("seats", ride.getAvailableSeats());
+                intent.putExtra("driverName", ride.getDriverName());
+                startActivity(intent);
             }
         });
         ridesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -134,6 +184,7 @@ public class SearchRideActivity extends AppCompatActivity {
                             }
                         }
 
+                        sortRides();
                         adapter.notifyDataSetChanged();
 
                         if (rideList.isEmpty()) {
@@ -151,5 +202,33 @@ public class SearchRideActivity extends AppCompatActivity {
                         Toast.makeText(SearchRideActivity.this, "Search failed", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void sortRides() {
+        if (rideList == null || rideList.isEmpty()) {
+            return;
+        }
+
+        if ("Cheapest".equals(currentSortOption)) {
+            // Sort by price (ascending)
+            Collections.sort(rideList, new Comparator<Ride>() {
+                @Override
+                public int compare(Ride r1, Ride r2) {
+                    return Double.compare(r1.getPricePerSeat(), r2.getPricePerSeat());
+                }
+            });
+        } else if ("Fastest".equals(currentSortOption)) {
+            // Sort by time (earliest first)
+            Collections.sort(rideList, new Comparator<Ride>() {
+                @Override
+                public int compare(Ride r1, Ride r2) {
+                    return r1.getTime().compareTo(r2.getTime());
+                }
+            });
+        }
+
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();
+        }
     }
 }
