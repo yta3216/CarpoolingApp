@@ -1,25 +1,25 @@
 package com.carpoolingapp.models;
 
-// File: CarpoolingApp/app/src/main/java/com/carpooling/app/models/Message.java
-
 public class Message {
     private String messageId;
+    private String chatId;
     private String senderId;
     private String senderName;
     private String receiverId;
-    private String message;
+    private String text;
     private long timestamp;
     private boolean isRead;
 
-    // Default constructor required for Firebase
     public Message() {
+        // Required empty constructor for Firebase
     }
 
-    public Message(String senderId, String senderName, String receiverId, String message) {
+    public Message(String chatId, String senderId, String senderName, String receiverId, String text) {
+        this.chatId = chatId;
         this.senderId = senderId;
         this.senderName = senderName;
         this.receiverId = receiverId;
-        this.message = message;
+        this.text = text;
         this.timestamp = System.currentTimeMillis();
         this.isRead = false;
     }
@@ -31,6 +31,14 @@ public class Message {
 
     public void setMessageId(String messageId) {
         this.messageId = messageId;
+    }
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 
     public String getSenderId() {
@@ -57,12 +65,12 @@ public class Message {
         this.receiverId = receiverId;
     }
 
-    public String getMessage() {
-        return message;
+    public String getText() {
+        return text;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public long getTimestamp() {

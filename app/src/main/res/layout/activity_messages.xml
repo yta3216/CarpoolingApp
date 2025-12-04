@@ -6,26 +6,41 @@
     android:orientation="vertical"
     android:background="@color/background_light">
 
-    <!-- Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- Header -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/background_blue"
+        android:layout_height="wrap_content"
+        android:background="@color/primary_blue"
         android:elevation="4dp"
-        android:paddingStart="20dp"
-        app:navigationIcon="@drawable/white_arrow"
-        app:title="Messages"
-        app:titleTextColor="@color/white" />
+        android:orientation="vertical"
+        android:padding="20dp">
 
-    <!-- Messages List -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/messages"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Your conversations"
+            android:textColor="@color/white"
+            android:alpha="0.8"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- Chats RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/messagesRecyclerView"
+        android:id="@+id/chatsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp"
-        android:clipToPadding="false" />
+        android:background="@color/white" />
 
     <!-- Empty State -->
     <LinearLayout
@@ -35,6 +50,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="vertical"
+        android:padding="32dp"
         android:visibility="visible">
 
         <ImageView
@@ -50,7 +66,31 @@
             android:layout_marginTop="16dp"
             android:text="No chat yet"
             android:textColor="@color/text_secondary"
-            android:textSize="16sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Start booking rides to chat with drivers"
+            android:textAlignment="center"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Load Demo Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/loadDemoButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="💬 Load Demo Chats"
+            android:textColor="@color/primary_blue"
+            app:strokeColor="@color/primary_blue"
+            app:cornerRadius="20dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp" />
 
     </LinearLayout>
 
@@ -60,9 +100,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        app:itemIconTint="@color/primary_blue"
-        app:itemTextColor="@color/primary_blue"
-        app:labelVisibilityMode="labeled"
+        android:elevation="8dp"
         app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>
