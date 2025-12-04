@@ -69,6 +69,7 @@
 
     </androidx.cardview.widget.CardView>
 
+    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -78,8 +79,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="16dp">
 
+            <!-- Available Rides Section -->
             <TextView
                 android:id="@+id/hostingRidesHeader"
                 android:layout_width="wrap_content"
@@ -96,9 +99,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:isScrollContainer="false"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never" />
+                android:nestedScrollingEnabled="false" />
 
+            <!-- Ride Requests Section -->
             <TextView
                 android:id="@+id/requestRidesHeader"
                 android:layout_width="wrap_content"
@@ -106,7 +109,7 @@
                 android:text="Ride Requests"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/primary_blue"
+                android:textColor="@color/status_active"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"/>
 
@@ -115,39 +118,55 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:isScrollContainer="false"
-                android:nestedScrollingEnabled="false"
-                android:overScrollMode="never" />
+                android:nestedScrollingEnabled="false" />
+
+            <!-- Empty State -->
+            <LinearLayout
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingVertical="32dp">
+
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:alpha="0.3"
+                    android:src="@android:drawable/ic_menu_search"
+                    android:contentDescription="No rides" />
+
+                <TextView
+                    android:id="@+id/emptyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/empty_all_rides"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp"
+                    android:textAlignment="center"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
+
     </ScrollView>
 
-    <LinearLayout
-        android:id="@+id/emptyState"
+    <!-- Demo Button - Always visible at bottom -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/demoButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:alpha="0.3"
-            android:contentDescription="No rides"
-            android:src="@android:drawable/ic_menu_search" />
-
-        <TextView
-            android:id="@+id/emptyText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:text="No rides found"
-            android:textAlignment="center"
-            android:textColor="@color/text_secondary"
-            android:textSize="16sp" />
-    </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="🎬 Try Demo Booking"
+        android:textColor="@color/primary_blue"
+        app:strokeColor="@color/primary_blue"
+        app:cornerRadius="20dp"
+        android:paddingVertical="12dp" />
 
 </LinearLayout>

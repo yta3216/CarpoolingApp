@@ -1,53 +1,53 @@
 package com.carpoolingapp.activities;
 
-// File: CarpoolingApp/app/src/main/java/com/carpooling/app/activities/RatingActivity.java
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import com.carpoolingapp.R;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
 
 public class RatingActivity extends AppCompatActivity {
 
-    private TextView ratingTitle;
     private RatingBar ratingBar;
-    private TextInputEditText reviewEditText;
-    private MaterialButton submitButton;
+    private EditText reviewEditText;
+    private MaterialButton submitButton, skipButton;
+    private TextView titleText, subtitleText;
+
+    private boolean isDemo = false;
+    private String rideId;
+    private String driverId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rating);
 
+        // Get intent extras
+        isDemo = getIntent().getBooleanExtra("isDemo", false);
+        rideId = getIntent().getStringExtra("rideId");
+        driverId = getIntent().getStringExtra("driverId");
+
         initViews();
-        setupToolbar();
         setupListeners();
     }
 
     private void initViews() {
-        ratingTitle = findViewById(R.id.ratingTitle);
         ratingBar = findViewById(R.id.ratingBar);
         reviewEditText = findViewById(R.id.reviewEditText);
         submitButton = findViewById(R.id.submitButton);
-    }
+        skipButton = findViewById(R.id.skipButton);
+        titleText = findViewById(R.id.titleText);
+        subtitleText = findViewById(R.id.subtitleText);
 
-    private void setupToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (isDemo) {
+            titleText.setText("🎬 Demo: Rate Your Ride");
+            subtitleText.setText("Try rating your demo driver!");
         }
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
     }
 
     private void setupListeners() {
@@ -55,6 +55,13 @@ public class RatingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 submitRating();
+            }
+        });
+
+        skipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                skipRating();
             }
         });
     }
@@ -68,18 +75,25 @@ public class RatingActivity extends AppCompatActivity {
             return;
         }
 
-        submitButton.setEnabled(false);
-        submitButton.setText("Submitting...");
+        if (isDemo) {
+            // Demo mode - just show success and go home
+            Toast.makeText(this, "⭐ Demo rating submitted: " + rating + " stars!", Toast.LENGTH_SHORT).show();
+            goToHome();
+        } else {
+            // TODO: Save rating to Firebase
+            Toast.makeText(this, "Thank you for your feedback!", Toast.LENGTH_SHORT).show();
+            goToHome();
+        }
+    }
 
-        // TODO: Save rating to Firebase
+    private void skipRating() {
+        goToHome();
+    }
 
-        // Simulate success
-        submitButton.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(RatingActivity.this, "Thank you for your feedback!", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }, 1500);
+    private void goToHome() {
+        Intent intent = new Intent(RatingActivity.this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 }

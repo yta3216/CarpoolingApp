@@ -47,4 +47,8 @@
     <!-- Ride Type Colors -->
     <color name="ride_looking_bg">#E8F5E9</color>
     <color name="ride_hosting_bg">#E3F2FD</color>
+
+    <!-- Tag Colors -->
+    <color name="tag_hosting">#FF9800</color>
+    <color name="tag_request">#4CAF50</color>
 </resources>

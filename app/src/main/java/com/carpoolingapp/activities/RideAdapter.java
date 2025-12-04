@@ -47,24 +47,19 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
         holder.driverNameText.setText(ride.getDriverName());
         holder.seatsText.setText(ride.getAvailableSeats() + " seats");
 
-        // NEW: Show/hide amenity icons based on ride amenities
-        holder.luggageIcon.setVisibility(ride.isAllowsLuggage() ? View.VISIBLE : View.GONE);
-        holder.petIcon.setVisibility(ride.isAllowsPets() ? View.VISIBLE : View.GONE);
-        holder.bikeIcon.setVisibility(ride.isAllowsBikes() ? View.VISIBLE : View.GONE);
-        holder.snowboardIcon.setVisibility(ride.isAllowsSnowboards() ? View.VISIBLE : View.GONE);
-
-        // Color coding based on ride type
-        if (holder.itemView instanceof com.google.android.material.card.MaterialCardView) {
-            com.google.android.material.card.MaterialCardView cardView =
-                    (com.google.android.material.card.MaterialCardView) holder.itemView;
-
-            if ("looking".equals(ride.getRideType())) {
-                cardView.setCardBackgroundColor(context.getColor(R.color.ride_looking_bg));
-            } else if ("hosting".equals(ride.getRideType())) {
-                cardView.setCardBackgroundColor(context.getColor(R.color.ride_hosting_bg));
-            } else {
-                cardView.setCardBackgroundColor(context.getColor(R.color.white));
-            }
+        // Set tag color and text based on ride type
+        if ("request".equals(ride.getRideType()) || "looking".equals(ride.getRideType())) {
+            // Green tag for ride requests
+            holder.rideTypeTag.setText("LOOKING");
+            holder.rideTypeTag.setBackgroundResource(R.drawable.bg_tag_request);
+        } else if ("hosting".equals(ride.getRideType())) {
+            // Orange tag for hosting rides
+            holder.rideTypeTag.setText("HOSTING");
+            holder.rideTypeTag.setBackgroundResource(R.drawable.bg_tag_hosting);
+        } else {
+            // Default (shouldn't happen)
+            holder.rideTypeTag.setText("RIDE");
+            holder.rideTypeTag.setBackgroundResource(R.drawable.bg_tag_hosting);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -76,14 +71,13 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
             }
         });
     }
-
     @Override
     public int getItemCount() {
         return rideList.size();
     }
 
     static class RideViewHolder extends RecyclerView.ViewHolder {
-        TextView fromText, toText, dateText, timeText, priceText, driverNameText, seatsText;
+        TextView fromText, toText, dateText, timeText, priceText, driverNameText, seatsText, rideTypeTag;
         ImageView luggageIcon, petIcon, bikeIcon, snowboardIcon;
 
         public RideViewHolder(@NonNull View itemView) {
@@ -101,6 +95,7 @@ public class RideAdapter extends RecyclerView.Adapter<RideAdapter.RideViewHolder
             petIcon = itemView.findViewById(R.id.ic_pet);
             bikeIcon = itemView.findViewById(R.id.ic_bike);
             snowboardIcon = itemView.findViewById(R.id.ic_snowboard);
+            rideTypeTag = itemView.findViewById(R.id.rideTypeTag);
         }
     }
 }

@@ -98,14 +98,34 @@ public class RideConfirmationActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
+        boolean isDemo = getIntent().getBooleanExtra("isDemo", false);
+
         primaryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Navigate based on confirmation type
-                Intent intent = new Intent(RideConfirmationActivity.this, HomeActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
+                if (isDemo) {
+                    // Demo flow: Go to rating
+                    Intent intent = new Intent(RideConfirmationActivity.this, RatingActivity.class);
+                    intent.putExtra("isDemo", true);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    // Normal flow: Navigate based on confirmation type
+                    String type = getIntent().getStringExtra("confirmationType");
+                    if ("booking".equals(type)) {
+                        // Go to bookings page
+                        Intent intent = new Intent(RideConfirmationActivity.this, HomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        // Go to listings page
+                        Intent intent = new Intent(RideConfirmationActivity.this, HomeActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
             }
         });
 

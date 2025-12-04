@@ -101,6 +101,7 @@
             android:name=".activities.RideDetailActivity"
             android:exported="false" />
 
+
     </application>
 
 </manifest>

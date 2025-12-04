@@ -3,9 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_margin="8dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,93 +16,43 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Price, Seats, and Amenity Icons -->
+        <!-- Top Row: Tag and Price -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <!-- Ride Type Tag -->
+            <TextView
+                android:id="@+id/rideTypeTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="HOSTING"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_tag_hosting"
+                android:elevation="2dp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
 
             <!-- Price -->
             <TextView
                 android:id="@+id/priceText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$45"
-                android:textColor="@color/text_primary"
-                android:textSize="25sp"
+                android:text="$0.00"
+                android:textColor="@color/primary_blue"
+                android:textSize="20sp"
                 android:textStyle="bold" />
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <!-- Seats -->
-            <TextView
-                android:id="@+id/seatsText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="16dp"
-                android:text="2 seats"
-                android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
-
-            <!-- Amenity Icons (Like in your screenshot) -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <!-- Luggage Icon -->
-                <ImageView
-                    android:id="@+id/ic_luggage"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="8dp"
-                    android:padding="4dp"
-                    android:src="@drawable/ic_luggage"
-                    android:visibility="gone"
-                    android:background="@drawable/bg_amenity_icon"
-                    android:contentDescription="Luggage allowed" />
-
-                <!-- Pet Icon -->
-                <ImageView
-                    android:id="@+id/ic_pet"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="8dp"
-                    android:padding="4dp"
-                    android:src="@drawable/ic_pet"
-                    android:visibility="gone"
-                    android:background="@drawable/bg_amenity_icon"
-                    android:contentDescription="Pet friendly" />
-
-                <!-- Bike Icon -->
-                <ImageView
-                    android:id="@+id/ic_bike"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="8dp"
-                    android:padding="4dp"
-                    android:src="@drawable/ic_bike"
-                    android:visibility="gone"
-                    android:background="@drawable/bg_amenity_icon"
-                    android:contentDescription="Bikes allowed" />
-
-                <!-- Snowboard Icon -->
-                <ImageView
-                    android:id="@+id/ic_snowboard"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:padding="4dp"
-                    android:src="@drawable/ic_snowboard"
-                    android:visibility="gone"
-                    android:background="@drawable/bg_amenity_icon"
-                    android:contentDescription="Snowboards allowed" />
-
-            </LinearLayout>
 
         </LinearLayout>
 
@@ -107,8 +60,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
             <ImageView
                 android:layout_width="20dp"
@@ -122,12 +75,12 @@
                 android:id="@+id/fromText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="Pickup Location"
+                android:layout_marginStart="8dp"
+                android:text="From Location"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -135,90 +88,113 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
 
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_gravity="center_vertical"
-                android:contentDescription="To"
                 android:src="@android:drawable/ic_dialog_map"
-                app:tint="@color/button_primary" />
+                android:contentDescription="To"
+                app:tint="@color/status_error" />
 
             <TextView
                 android:id="@+id/toText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:text="Destination"
+                android:layout_marginStart="8dp"
+                android:text="To Location"
                 android:textColor="@color/text_primary"
-                android:textSize="14sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
-        <!-- Date & Time -->
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:layout_marginVertical="8dp" />
+
+        <!-- Bottom Row: Date, Time, Seats, Driver -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center_vertical"
-                android:contentDescription="Date"
-                android:src="@drawable/today"
-                app:tint="@color/text_secondary" />
-
-            <TextView
-                android:id="@+id/dateText"
-                android:layout_width="wrap_content"
+            <!-- Date -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="6dp"
-                android:text="Jan 15, 2025"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="16dp"
-                android:src="@android:drawable/ic_menu_recent_history"
-                android:contentDescription="Time"
-                app:tint="@color/text_secondary" />
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    app:tint="@color/text_secondary" />
 
-            <TextView
-                android:id="@+id/timeText"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/dateText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Date"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <!-- Time -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="6dp"
-                android:text="10:00 AM"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    app:tint="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/timeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Time"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Driver Info -->
+        <!-- Second Bottom Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
 
+            <!-- Seats -->
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/seatsText"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Driver: "
+                android:layout_weight="1"
+                android:text="0 seats"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
+            <!-- Driver Name -->
             <TextView
                 android:id="@+id/driverNameText"
                 android:layout_width="0dp"
@@ -227,7 +203,8 @@
                 android:text="Driver Name"
                 android:textColor="@color/text_primary"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:gravity="end" />
 
         </LinearLayout>
 
